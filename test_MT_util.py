@@ -34,7 +34,7 @@ def test_all_case(net, image_list, num_classes=1, save_result=True, test_save_pa
         # res = net(img_var).softmax(dim=1) # shape(1, 2, 416, 416)
         # prediction = np.array(transforms.Resize((h, w))(to_pil(res.data.squeeze(0).cpu()[1, :, :])))
         # up_edge, up_shadow, up_subitizing, up_shadow_final = net(img_var) #subitizing
-        up_edge, up_shadow, up_shadow_final = net(img_var)  # subiziting
+        up_edge, up_shadow, _, up_shadow_final = net(img_var)  # subiziting
         # up_sal_final = net(img_var)
         # up_shadow_final, up_subitizing = net(img_var)  # subiziting
         res = torch.sigmoid(up_shadow_final[-1])
@@ -69,7 +69,7 @@ def test_all_case(net, image_list, num_classes=1, save_result=True, test_save_pa
             ber_shadow = (1 - TP / Np) * 100
             ber_unshadow = (1 - TN / Nn) * 100
             ber_mean = 0.5 * (2 - TP / Np - TN / Nn) * 100
-            print("Current ber is {}, shadow_ber is {}, unshadow ber is {}".format(ber_mean, ber_shadow, ber_unshadow))
+            # print("Current ber is {}, shadow_ber is {}, unshadow ber is {}".format(ber_mean, ber_shadow, ber_unshadow))
         '''
         Save prediction
         '''
@@ -81,8 +81,8 @@ def test_all_case(net, image_list, num_classes=1, save_result=True, test_save_pa
 def cal_acc(prediction, label, thr = 128):
     prediction = (prediction > thr)
     label = (label > thr)
-    prediction_tmp = prediction.astype(np.float)
-    label_tmp = label.astype(np.float)
+    prediction_tmp = prediction.astype(np.float32)
+    label_tmp = label.astype(np.float32)
     TP = np.sum(prediction_tmp * label_tmp)
     TN = np.sum((1 - prediction_tmp) * (1 - label_tmp))
     Np = np.sum(label_tmp)
